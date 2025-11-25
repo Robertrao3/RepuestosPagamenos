@@ -2,20 +2,19 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// REPLACE THESE VALUES with the ones from your Firebase Console!
+// Access the variables defined in your .env file
 const firebaseConfig = {
-  apiKey: "AIzaSyB4aqppe2StSZrixjLsW2rwH5S3lh71Nhs",
-  authDomain: "repuestospagamenos-1e83e.firebaseapp.com",
-  projectId: "repuestospagamenos-1e83e",
-  storageBucket: "repuestospagamenos-1e83e.firebasestorage.app",
-  messagingSenderId: "64171724950",
-  appId: "1:64171724950:web:3ac97b70537b258c4d32b7",
-  measurementId: "G-N9DESK4BC2"
+  apiKey: import.meta.env.VITE_API_KEY,
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_APP_ID
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Export the tools so we can import them in other files
+// Export the tools so they can be imported elsewhere
 export const auth = getAuth(app);
 export const db = getFirestore(app);
