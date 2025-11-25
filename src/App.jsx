@@ -1,3 +1,5 @@
+import Inventory from './Inventory'
+
 function App() {
   return (
     <div className="font-sans">
@@ -8,6 +10,7 @@ function App() {
           <ul className="flex gap-8 list-none">
             <li><a href="#home" className="text-white no-underline font-medium hover:text-[#e94560] transition-colors">Inicio</a></li>
             <li><a href="#services" className="text-white no-underline font-medium hover:text-[#e94560] transition-colors">Servicios</a></li>
+            <li><a href="#inventory" className="text-white no-underline font-medium hover:text-[#e94560] transition-colors">Inventario</a></li>
             <li><a href="#about" className="text-white no-underline font-medium hover:text-[#e94560] transition-colors">Nosotros</a></li>
             <li><a href="#contact" className="text-white no-underline font-medium hover:text-[#e94560] transition-colors">Contacto</a></li>
           </ul>
@@ -57,8 +60,13 @@ function App() {
         </div>
       </section>
 
+      {/* Inventory Section */}
+      <section id="inventory" className="bg-white">
+        <Inventory />
+      </section>
+
       {/* About Section */}
-      <section id="about" className="py-16 px-8 max-w-7xl mx-auto bg-white">
+      <section id="about" className="py-16 px-8 max-w-7xl mx-auto bg-gray-50">
         <h2 className="text-5xl font-bold mb-8 text-center text-[#1a1a2e]">Sobre Nosotros</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
@@ -67,15 +75,15 @@ function App() {
             <p className="text-lg text-gray-700">Nos enorgullecemos del conocimiento experto y el servicio personalizado. Nuestro equipo puede ayudarle a encontrar exactamente la pieza correcta para su aplicación específica.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6 bg-gray-50 rounded-xl">
+            <div className="text-center p-6 bg-white rounded-xl shadow">
               <div className="text-5xl font-bold text-[#e94560] mb-2">10.000</div>
               <p className="text-gray-700">Repuestos en Stock</p>
             </div>
-            <div className="text-center p-6 bg-gray-50 rounded-xl">
+            <div className="text-center p-6 bg-white rounded-xl shadow">
               <div className="text-5xl font-bold text-[#e94560] mb-2">20+</div>
               <p className="text-gray-700">Años de Experiencia</p>
             </div>
-            <div className="text-center p-6 bg-gray-50 rounded-xl">
+            <div className="text-center p-6 bg-white rounded-xl shadow">
               <div className="text-5xl font-bold text-[#e94560] mb-2">10,000+</div>
               <p className="text-gray-700">Clientes Satisfechos</p>
             </div>
