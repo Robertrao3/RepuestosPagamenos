@@ -9,3 +9,28 @@
   }
 }
 
+/* ----------------------------- */
+/*   AUTO-SCROLL BRAND CAROUSEL  */
+/* ----------------------------- */
+
+.brands-track {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;               /* espacio entre logos */
+  width: max-content;        /* ancho basado en su contenido */
+  animation: brands-scroll 30s linear infinite;
+}
+
+.brands-track:hover {
+  animation-play-state: paused; /* pausa el carrusel al hacer hover */
+}
+
+@keyframes brands-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%); /* hace el loop infinito suave */
+  }
+}
+
