@@ -1,13 +1,24 @@
 // src/Inventory.jsx
 import { useState, useEffect } from "react";
 import { collection, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { db } from "./firebase";
+import { db, auth } from "./firebase";
+import { onAuthStateChanged } from 'firebase/auth';
+import AdminLogin from './AdminLogin';
 
 function Inventory() {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterAvailable, setFilterAvailable] = useState("all"); // 'all' | 'available' | 'unavailable'
+  const [filterAvailable, setFilterAvailable] = useState("all");
+  const [user, setUser] = useState(null);
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     fetchInventory();
@@ -15,7 +26,7 @@ function Inventory() {
 
   const fetchInventory = async () => {
     try {
-      const snap = await getDocs(collection(db, "products")); // 👈 lee de 'products'
+      const snap = await getDocs(collection(db, "products"));
       const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       console.log("📦 Productos cargados desde Firestore:", items.length);
       setInventory(items);
@@ -27,6 +38,11 @@ function Inventory() {
   };
 
   const handleDelete = async (id) => {
+    if (!user) {
+      alert("Debes iniciar sesión como administrador");
+      return;
+    }
+
     if (!window.confirm("¿Está seguro de eliminar este repuesto?")) return;
 
     try {
@@ -34,10 +50,16 @@ function Inventory() {
       setInventory((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
       console.error("Error deleting item:", error);
+      alert("Error al eliminar el producto");
     }
   };
 
   const toggleAvailability = async (item) => {
+    if (!user) {
+      alert("Debes iniciar sesión como administrador");
+      return;
+    }
+
     try {
       await updateDoc(doc(db, "products", item.id), {
         disponible: !item.disponible,
@@ -49,19 +71,16 @@ function Inventory() {
       );
     } catch (error) {
       console.error("Error updating availability:", error);
+      alert("Error al actualizar disponibilidad");
     }
   };
 
-  // ---------- FILTER + SEARCH ----------
   const filteredInventory = inventory.filter((item) => {
     const term = searchTerm.trim().toLowerCase();
-
-    // Safe fields
     const nombre = (item.nombre || "").toLowerCase();
     const codigo = (item.codigo || "").toLowerCase();
     const descripcion = (item.descripcion || "").toLowerCase();
     const aplicacionTexto = (item.aplicacion?.texto || "").toLowerCase();
-
     const equivalenciasText = Array.isArray(item.equivalencias)
       ? item.equivalencias.map((e) => e.toLowerCase())
       : [];
@@ -84,8 +103,6 @@ function Inventory() {
     return matchesSearch && matchesAvailability;
   });
 
-  // ---------- GROUP BY SECTION / CATEGORY ----------
-  // Usamos item.categoria si existe; si no, todo va a "Otros"
   const groupedByCategory = filteredInventory.reduce((acc, item) => {
     const category =
       item.categoria ||
@@ -94,7 +111,6 @@ function Inventory() {
       "Otros repuestos";
 
     if (!acc[category]) acc[category] = [];
-    acc[category] = acc[category].slice(); // ensure new array
     acc[category].push(item);
     return acc;
   }, {});
@@ -115,10 +131,11 @@ function Inventory() {
         Inventario en Línea
       </h2>
       <p className="text-gray-600 text-center mb-8">
-        Busca por nombre, código, descripción o aplicación.  
-        Ejemplo: escribe <span className="font-semibold">"freno"</span> para ver
-        todos los productos relacionados con frenos.
+        Busca por nombre, código, descripción o aplicación.
       </p>
+
+      {/* Admin Login Section */}
+      <AdminLogin user={user} />
 
       {/* Search + filters */}
       <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
@@ -138,9 +155,7 @@ function Inventory() {
               onChange={(e) => setFilterAvailable(e.target.value)}
               className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#e94560] focus:border-transparent"
             >
-              <option value="all">
-                Todos ({inventory.length})
-              </option>
+              <option value="all">Todos ({inventory.length})</option>
               <option value="available">
                 Solo disponibles ({inventory.filter((i) => i.disponible).length})
               </option>
@@ -264,27 +279,29 @@ function Inventory() {
                     </p>
                   )}
 
-                  {/* Actions */}
-                  <div className="flex gap-2 pt-3 border-t">
-                    <button
-                      onClick={() => toggleAvailability(item)}
-                      className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
-                        item.disponible
-                          ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                          : "bg-green-500 hover:bg-green-600 text-white"
-                      }`}
-                    >
-                      {item.disponible
-                        ? "Marcar agotado"
-                        : "Marcar disponible"}
-                    </button>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs font-semibold"
-                    >
-                      🗑️ Borrar
-                    </button>
-                  </div>
+                  {/* Admin Actions - Only visible when logged in */}
+                  {user && (
+                    <div className="flex gap-2 pt-3 border-t">
+                      <button
+                        onClick={() => toggleAvailability(item)}
+                        className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                          item.disponible
+                            ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                            : "bg-green-500 hover:bg-green-600 text-white"
+                        }`}
+                      >
+                        {item.disponible
+                          ? "Marcar agotado"
+                          : "Marcar disponible"}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs font-semibold"
+                      >
+                        🗑️ Borrar
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
