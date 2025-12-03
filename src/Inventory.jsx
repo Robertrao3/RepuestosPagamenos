@@ -1,25 +1,15 @@
 // src/Inventory.jsx
 import { useState, useEffect } from "react";
 import { collection, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { db, auth } from "./firebase";
-import { onAuthStateChanged } from 'firebase/auth';
-import AdminLogin from './AdminLogin';
+import { db } from "./firebase"; // 👈 ya NO importamos auth ni AdminLogin
 
-function Inventory() {
+function Inventory({ enableAdmin = false, user = null }) {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterAvailable, setFilterAvailable] = useState("all");
-  const [user, setUser] = useState(null);
 
-  // Listen for auth state changes
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
-
+  // Cargar inventario desde Firestore
   useEffect(() => {
     fetchInventory();
   }, []);
@@ -38,8 +28,8 @@ function Inventory() {
   };
 
   const handleDelete = async (id) => {
-    if (!user) {
-      alert("Debes iniciar sesión como administrador");
+    if (!enableAdmin || !user) {
+      alert("Solo un administrador autenticado puede eliminar productos.");
       return;
     }
 
@@ -55,8 +45,8 @@ function Inventory() {
   };
 
   const toggleAvailability = async (item) => {
-    if (!user) {
-      alert("Debes iniciar sesión como administrador");
+    if (!enableAdmin || !user) {
+      alert("Solo un administrador autenticado puede cambiar la disponibilidad.");
       return;
     }
 
@@ -133,9 +123,6 @@ function Inventory() {
       <p className="text-gray-600 text-center mb-8">
         Busca por nombre, código, descripción o aplicación.
       </p>
-
-      {/* Admin Login Section */}
-      <AdminLogin user={user} />
 
       {/* Search + filters */}
       <div className="bg-white p-6 rounded-xl shadow-lg mb-8">
@@ -279,8 +266,8 @@ function Inventory() {
                     </p>
                   )}
 
-                  {/* Admin Actions - Only visible when logged in */}
-                  {user && (
+                  {/* Botones de ADMIN – solo si enableAdmin && user */}
+                  {enableAdmin && user && (
                     <div className="flex gap-2 pt-3 border-t">
                       <button
                         onClick={() => toggleAvailability(item)}
