@@ -225,24 +225,33 @@ function Inventory({ enableAdmin = false, user = null, initialSearch = "", initi
   }, [expanded, inventory, searchTerm]);
 
   const fetchInventory = async () => {
+    const PAGE = 1000;
     try {
-      const all = [];
-      const PAGE = 1000;
-      let from = 0;
-      while (true) {
-        const { data, error } = await supabase
-          .from("products")
-          .select("*")
-          .range(from, from + PAGE - 1);
-        if (error) throw error;
-        all.push(...data);
-        if (data.length < PAGE) break;
-        from += PAGE;
+      const { data: firstPage, error, count } = await supabase
+        .from("products")
+        .select("*", { count: "exact" })
+        .range(0, PAGE - 1);
+      if (error) throw error;
+
+      setInventory(firstPage || []);
+      setLoading(false);
+
+      const total = count ?? firstPage.length;
+      if (total > firstPage.length) {
+        const ranges = [];
+        for (let from = PAGE; from < total; from += PAGE) {
+          ranges.push([from, from + PAGE - 1]);
+        }
+        const results = await Promise.all(
+          ranges.map(([from, to]) =>
+            supabase.from("products").select("*").range(from, to)
+          )
+        );
+        const rest = results.flatMap((r) => r.data || []);
+        setInventory([...(firstPage || []), ...rest]);
       }
-      setInventory(all);
     } catch (error) {
       console.error("Error fetching inventory:", error);
-    } finally {
       setLoading(false);
     }
   };
