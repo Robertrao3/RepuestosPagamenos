@@ -1,70 +1,70 @@
-// src/pages/ServicesPage.jsx
+import { usePageTitle } from "../hooks/usePageTitle";
+
+const SERVICES = [
+  {
+    icon: "🔩",
+    title: "Repuestos Originales",
+    desc: "Repuestos OEM garantizados directamente de proveedores confiables. Ajuste y funcionamiento perfecto para su vehículo.",
+  },
+  {
+    icon: "🛠️",
+    title: "Repuestos Alternativos",
+    desc: "Alternativas de alta calidad que cumplen o superan los estándares originales a precios más competitivos.",
+  },
+  {
+    icon: "⚙️",
+    title: "Componentes del Motor",
+    desc: "Desde filtros hasta piezas principales de motor. Orientación experta en selección y compatibilidad.",
+  },
+  {
+    icon: "🛑",
+    title: "Sistemas de Frenos",
+    desc: "Pastillas, discos, calipers y componentes completos del sistema de frenos para una frenada segura.",
+  },
+  {
+    icon: "🛞",
+    title: "Suspensión y Dirección",
+    desc: "Inventario completo de amortiguadores, terminales, rótulas y más para mantener su vehículo controlado.",
+  },
+  {
+    icon: "💬",
+    title: "Asesoría Técnica",
+    desc: "Nuestro equipo capacitado le ayuda a identificar exactamente la pieza correcta para su aplicación.",
+  },
+];
+
 export default function ServicesPage() {
+  usePageTitle("Servicios");
   return (
-    <section
-      id="services"
-      className="pt-24 pb-16 px-8 max-w-7xl mx-auto bg-gray-50 min-h-screen"
-    >
-      <h2 className="text-5xl font-bold mb-8 text-center text-[#1a1a2e]">
-        Nuestros Servicios
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-        <div className="bg-white p-8 rounded-xl shadow-lg hover:-translate-y-3 transition-transform">
-          <h3 className="text-[#e94560] text-2xl font-semibold mb-4">
-            Repuestos Originales
-          </h3>
-          <p className="text-gray-700">
-            Repuestos originales de fabricante garantizados para ajustarse y
-            funcionar perfectamente en su vehículo. Obtenemos directamente de
-            proveedores confiables.
-          </p>
-        </div>
-        <div className="bg-white p-8 rounded-xl shadow-lg hover:-translate-y-3 transition-transform">
-          <h3 className="text-[#e94560] text-2xl font-semibold mb-4">
-            Repuestos Alternativos
-          </h3>
-          <p className="text-gray-700">
-            Alternativas de alta calidad que cumplen o superan los estándares
-            originales a precios competitivos.
-          </p>
-        </div>
-        <div className="bg-white p-8 rounded-xl shadow-lg hover:-translate-y-3 transition-transform">
-          <h3 className="text-[#e94560] text-2xl font-semibold mb-4">
-            Componentes del Motor
-          </h3>
-          <p className="text-gray-700">
-            Gama completa de piezas de motor desde filtros hasta componentes
-            principales. Orientación experta sobre selección y compatibilidad.
-          </p>
-        </div>
-        <div className="bg-white p-8 rounded-xl shadow-lg hover:-translate-y-3 transition-transform">
-          <h3 className="text-[#e94560] text-2xl font-semibold mb-4">
-            Sistemas de Frenos
-          </h3>
-          <p className="text-gray-700">
-            Pastillas de freno premium, discos, calipers y componentes completos
-            del sistema de frenos para una potencia de frenado segura.
-          </p>
-        </div>
-        <div className="bg-white p-8 rounded-xl shadow-lg hover:-translate-y-3 transition-transform">
-          <h3 className="text-[#e94560] text-2xl font-semibold mb-4">
-            Suspensión y Dirección
-          </h3>
-          <p className="text-gray-700">
-            Inventario completo de componentes de suspensión y piezas de
-            dirección para mantener su viaje suave y controlado.
-          </p>
-        </div>
-        <div className="bg-white p-8 rounded-xl shadow-lg hover:-translate-y-3 transition-transform">
-          <h3 className="text-[#e94560] text-2xl font-semibold mb-4">
-            Asesoría Técnica
-          </h3>
-          <p className="text-gray-700">
-            Personal capacitado para ayudarle a encontrar exactamente la pieza
-            correcta para su aplicación específica.
-          </p>
+    <div className="min-h-screen bg-white">
+      {/* Header banner */}
+      <div className="bg-[#111111] px-4 py-12 text-center">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2">
+          Nuestros <span className="text-[#E05020]">Servicios</span>
+        </h1>
+        <p className="text-white/50 text-sm max-w-md mx-auto">
+          Todo lo que necesitas para mantener tu vehículo en óptimas condiciones.
+        </p>
+      </div>
+      <div className="h-1 bg-[#E05020]" />
+
+      {/* Cards */}
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {SERVICES.map((s) => (
+            <div
+              key={s.title}
+              className="bg-white border border-gray-200 rounded-xl p-6 hover:border-[#E05020] hover:shadow-md transition-all group"
+            >
+              <div className="text-3xl mb-3">{s.icon}</div>
+              <h3 className="font-bold text-gray-900 text-base mb-2 group-hover:text-[#E05020] transition-colors">
+                {s.title}
+              </h3>
+              <p className="text-gray-500 text-sm leading-relaxed">{s.desc}</p>
+            </div>
+          ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }
