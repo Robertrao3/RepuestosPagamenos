@@ -4,6 +4,7 @@ import { supabase } from "./supabase";
 import { getCategory, getCategoryIcon } from "./categories";
 import { useCart } from "./context/CartContext";
 import { ImageManagerModal } from "./components/ImageManagerModal";
+import { ProductDetailModal } from "./components/ProductDetailModal";
 
 function normalizeText(str) {
   return (str || "").normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
@@ -13,6 +14,7 @@ const EMPTY_FORM = {
   id: "",
   codigo: "",
   nombre: "",
+  marca: "",
   descripcion: "",
   aplicacion_texto: "",
   aplicacion_modelo: "",
@@ -26,6 +28,7 @@ function ProductModal({ item, onClose, onSave }) {
           id: item.id,
           codigo: item.codigo || "",
           nombre: item.nombre || "",
+          marca: item.marca || "",
           descripcion: item.descripcion || "",
           aplicacion_texto: item.aplicacion?.texto || "",
           aplicacion_modelo: item.aplicacion?.modelo || "",
@@ -48,6 +51,7 @@ function ProductModal({ item, onClose, onSave }) {
       id: form.id.trim(),
       codigo: form.codigo.trim(),
       nombre: form.nombre.trim(),
+      marca: form.marca.trim(),
       descripcion: form.descripcion.trim(),
       aplicacion: {
         texto: form.aplicacion_texto.trim(),
@@ -112,6 +116,13 @@ function ProductModal({ item, onClose, onSave }) {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#E05020] focus:border-transparent" />
           </div>
 
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Marca</label>
+            <input name="marca" value={form.marca} onChange={handleChange}
+              placeholder="Ej: MOOG, GATES, BENDIX"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#E05020] focus:border-transparent" />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Aplicación (vehículo)</label>
@@ -167,6 +178,7 @@ function Inventory({ enableAdmin = false, user = null, initialSearch = "", initi
   );
   const [modalItem, setModalItem] = useState(undefined);
   const [imageProduct, setImageProduct] = useState(null);
+  const [detailProduct, setDetailProduct] = useState(null);
   const [addedIds, setAddedIds] = useState(new Set());
   const [productImages, setProductImages] = useState({}); // id → string[] | null
   const [lightbox, setLightbox] = useState(null); // { urls: string[], idx: number }
@@ -439,34 +451,26 @@ function Inventory({ enableAdmin = false, user = null, initialSearch = "", initi
                 <div className="px-6 pb-6 border-t border-gray-100">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
                     {items.map((item) => (
-                      <div key={item.id} className="p-5 rounded-xl border border-gray-100 bg-white hover:shadow-lg hover:border-gray-200 transition-all duration-200 flex flex-col shadow-sm">
-                        {/* Image area — only shown once fetched */}
-                        {item.id in productImages && (
-                          productImages[item.id] === null ? (
-                            /* No image uploaded */
-                            <div className="w-full h-32 rounded-lg mb-3 bg-gray-50 border border-dashed border-gray-200 flex flex-col items-center justify-center gap-1.5">
-                              <span className="text-3xl opacity-20">{getCategoryIcon(getCategory(item.nombre))}</span>
-                              <span className="text-[10px] text-gray-300 font-medium uppercase tracking-wider">Sin imagen</span>
-                            </div>
-                          ) : (
-                            /* Has images — click to open lightbox */
-                            <div
-                              className="relative w-full h-32 rounded-lg mb-3 bg-gray-50 border border-gray-100 overflow-hidden cursor-zoom-in group"
-                              onClick={() => setLightbox({ urls: productImages[item.id], idx: 0 })}
-                            >
-                              <img
-                                src={productImages[item.id][0]}
-                                alt={item.nombre}
-                                className="w-full h-full object-contain p-1 group-hover:scale-105 transition-transform duration-300"
-                                onError={(e) => { e.target.style.display = "none"; }}
-                              />
-                              {productImages[item.id].length > 1 && (
-                                <span className="absolute bottom-1.5 right-1.5 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                                  {productImages[item.id].length} fotos
-                                </span>
-                              )}
-                            </div>
-                          )
+                      <div
+                        key={item.id}
+                        onClick={() => setDetailProduct(item)}
+                        className="p-5 rounded-xl border border-gray-100 bg-white hover:shadow-lg hover:border-gray-200 transition-all duration-200 flex flex-col shadow-sm cursor-pointer"
+                      >
+                        {/* Image area — only shown when the product actually has photos */}
+                        {Array.isArray(productImages[item.id]) && productImages[item.id].length > 0 && (
+                          <div className="relative w-full h-32 rounded-lg mb-3 bg-gray-50 border border-gray-100 overflow-hidden group">
+                            <img
+                              src={productImages[item.id][0]}
+                              alt={item.nombre}
+                              className="w-full h-full object-contain p-1 group-hover:scale-105 transition-transform duration-300"
+                              onError={(e) => { e.target.style.display = "none"; }}
+                            />
+                            {productImages[item.id].length > 1 && (
+                              <span className="absolute bottom-1.5 right-1.5 bg-black/50 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                                {productImages[item.id].length} fotos
+                              </span>
+                            )}
+                          </div>
                         )}
                         <div className="flex justify-between items-start gap-2 mb-1.5">
                           <h4 className="font-bold text-[#111111] text-sm leading-snug flex-1">
@@ -499,7 +503,7 @@ function Inventory({ enableAdmin = false, user = null, initialSearch = "", initi
 
                         <div className="mt-auto pt-3 border-t border-gray-100 space-y-1.5">
                           <button
-                            onClick={() => handleAddToCart(item)}
+                            onClick={(e) => { e.stopPropagation(); handleAddToCart(item); }}
                             className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
                               addedIds.has(item.id)
                                 ? "bg-green-500 text-white scale-[0.98]"
@@ -516,19 +520,19 @@ function Inventory({ enableAdmin = false, user = null, initialSearch = "", initi
                           {enableAdmin && user && (
                             <div className="flex gap-1.5">
                               <button
-                                onClick={() => setModalItem(item)}
+                                onClick={(e) => { e.stopPropagation(); setModalItem(item); }}
                                 className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-xs font-semibold transition-colors"
                               >
                                 <Pencil className="w-3 h-3" /> Editar
                               </button>
                               <button
-                                onClick={() => setImageProduct(item)}
+                                onClick={(e) => { e.stopPropagation(); setImageProduct(item); }}
                                 className="flex-1 flex items-center justify-center gap-1 py-1.5 bg-violet-500 text-white rounded-lg hover:bg-violet-600 text-xs font-semibold transition-colors"
                               >
                                 <Images className="w-3 h-3" /> Fotos
                               </button>
                               <button
-                                onClick={() => handleDelete(item.id)}
+                                onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
                                 className="flex items-center justify-center px-2.5 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 text-xs font-semibold transition-colors"
                               >
                                 <X className="w-3 h-3" />
@@ -560,6 +564,17 @@ function Inventory({ enableAdmin = false, user = null, initialSearch = "", initi
         <ImageManagerModal
           product={imageProduct}
           onClose={() => setImageProduct(null)}
+        />
+      )}
+
+      {/* Product detail — image or "Imagen No Disponible", plus full details */}
+      {detailProduct && (
+        <ProductDetailModal
+          product={detailProduct}
+          images={productImages[detailProduct.id]}
+          onClose={() => setDetailProduct(null)}
+          onAddToCart={handleAddToCart}
+          onImageClick={(idx) => setLightbox({ urls: productImages[detailProduct.id], idx })}
         />
       )}
 
