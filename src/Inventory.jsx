@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { ChevronDown, ChevronUp, Search, X, Plus, Pencil, ShoppingCart, Check, Images } from "lucide-react";
 import { supabase } from "./supabase";
 import { getCategory, getCategoryIcon } from "./categories";
@@ -293,17 +293,32 @@ function Inventory({ enableAdmin = false, user = null, initialSearch = "", initi
 
   const isSearching = searchTerm.trim().length > 0;
 
+  // Precomputed per-item searchable text, so typing doesn't re-normalize
+  // every field of every product on each keystroke.
+  const searchIndex = useMemo(
+    () =>
+      inventory.map((item) =>
+        normalizeText(
+          [
+            item.nombre,
+            item.codigo,
+            item.descripcion,
+            item.aplicacion?.texto,
+            item.aplicacion?.modelo,
+            item.marca,
+            ...(item.equivalencias || []),
+          ]
+            .filter(Boolean)
+            .join(" ")
+        )
+      ),
+    [inventory]
+  );
+
   const filtered = isSearching
     ? (() => {
-        const term = normalizeText(searchTerm.trim());
-        return inventory.filter(
-          (item) =>
-            normalizeText(item.nombre).includes(term) ||
-            normalizeText(item.codigo).includes(term) ||
-            normalizeText(item.descripcion).includes(term) ||
-            normalizeText(item.aplicacion?.texto).includes(term) ||
-            (item.equivalencias || []).some((e) => normalizeText(e).includes(term))
-        );
+        const words = normalizeText(searchTerm.trim()).split(/\s+/).filter(Boolean);
+        return inventory.filter((item, i) => words.every((w) => searchIndex[i].includes(w)));
       })()
     : inventory;
 
