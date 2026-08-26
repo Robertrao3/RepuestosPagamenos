@@ -5,6 +5,7 @@ import { supabase } from "./supabase";
 
 import { CartProvider, useCart } from "./context/CartContext";
 import { CartDrawer } from "./components/CartDrawer";
+import { VenezuelaFlag } from "./components/VenezuelaFlag";
 
 import HomePage from "./pages/HomePage";
 const ServicesPage = lazy(() => import("./pages/ServicesPage"));
@@ -211,19 +212,7 @@ function AppShell() {
               Más de 20 años distribuyendo repuestos de calidad en Venezuela.
             </p>
             <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
-              <svg viewBox="0 0 30 20" className="w-5 h-3.5 rounded-sm overflow-hidden shrink-0" aria-label="Bandera de Venezuela">
-                <rect width="30" height="6.67" fill="#FFD100" />
-                <rect y="6.67" width="30" height="6.67" fill="#00247D" />
-                <rect y="13.33" width="30" height="6.67" fill="#CF142B" />
-                <g fill="white">
-                  {[0,1,2,3,4,5,6,7].map((i) => {
-                    const angle = (i * 360 / 8 - 90) * (Math.PI / 180);
-                    const cx = 15 + 4.5 * Math.cos(angle);
-                    const cy = 10 + 4.5 * Math.sin(angle);
-                    return <circle key={i} cx={cx} cy={cy} r="0.8" />;
-                  })}
-                </g>
-              </svg>
+              <VenezuelaFlag />
               <span className="text-white/50 text-xs">Servicio a nivel nacional</span>
             </div>
           </div>

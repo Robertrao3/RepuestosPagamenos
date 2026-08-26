@@ -3,89 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Search, ArrowRight } from "lucide-react";
 import { CATEGORY_MAP } from "../categories";
 import { usePageTitle } from "../hooks/usePageTitle";
-
-function CarSilhouette() {
-  return (
-    <svg
-      viewBox="0 0 900 280"
-      className="absolute right-0 bottom-0 w-[78%] md:w-[60%] opacity-[0.065] pointer-events-none select-none"
-      fill="white"
-      aria-hidden="true"
-    >
-      {/*
-        Sedan profile (Toyota Corolla-like) — single closed path.
-        Car faces LEFT. Front bumper at x≈82, rear at x≈782.
-        Ground at y=262. Wheel arches are concave cutouts in the bottom edge.
-        Front wheel: center (196, 210) r=52  →  arch x: 144–248
-        Rear  wheel: center (678, 210) r=52  →  arch x: 626–730
-      */}
-      <path d="
-        M 82,248
-        Q 80,222 98,215
-        L 172,205
-        Q 300,194 355,158
-        L 394,88
-        Q 408,74 426,72
-        L 570,72
-        Q 586,72 601,86
-        L 643,122
-        Q 662,136 688,140
-        L 728,140
-        Q 748,142 762,156
-        L 776,194
-        Q 782,224 782,262
-        L 730,262
-        Q 678,150 626,262
-        L 248,262
-        Q 196,150 144,262
-        L 82,262
-        Q 80,258 82,248
-        Z
-      " />
-
-      {/* Front wheel */}
-      <circle cx="196" cy="210" r="52" />
-      <circle cx="196" cy="210" r="28" fill="rgba(0,0,0,0.38)" />
-      <circle cx="196" cy="210" r="10" fill="rgba(255,255,255,0.18)" />
-
-      {/* Rear wheel */}
-      <circle cx="678" cy="210" r="52" />
-      <circle cx="678" cy="210" r="28" fill="rgba(0,0,0,0.38)" />
-      <circle cx="678" cy="210" r="10" fill="rgba(255,255,255,0.18)" />
-
-      {/* Headlight */}
-      <rect x="84" y="218" width="38" height="11" rx="5" fill="rgba(255,255,255,0.5)" />
-      {/* Taillight */}
-      <rect x="766" y="158" width="14" height="30" rx="4" fill="rgba(224,80,32,0.7)" />
-      {/* Door line */}
-      <line x1="316" y1="96" x2="306" y2="228" stroke="rgba(0,0,0,0.18)" strokeWidth="2.5" />
-      {/* Window glare strips */}
-      <line x1="340" y1="102" x2="330" y2="148" stroke="rgba(255,255,255,0.06)" strokeWidth="8" />
-      <line x1="468" y1="80" x2="468" y2="128" stroke="rgba(255,255,255,0.05)" strokeWidth="6" />
-    </svg>
-  );
-}
-
-function VenezuelaFlag() {
-  return (
-    <svg viewBox="0 0 30 20" className="w-5 h-3.5 rounded-sm overflow-hidden shadow-sm shrink-0" aria-label="Bandera de Venezuela">
-      <rect width="30" height="20" fill="#CF142B" />
-      <rect width="30" height="13.33" fill="#00247D" />
-      <rect width="30" height="6.67" fill="#CF142B" />
-      <rect y="6.67" width="30" height="6.67" fill="#00247D" />
-      <rect width="30" height="6.67" fill="#FFD100" />
-      {/* Stars arc */}
-      <g fill="white">
-        {[0,1,2,3,4,5,6,7].map((i) => {
-          const angle = (i * 360 / 8 - 90) * (Math.PI / 180);
-          const cx = 15 + 4.5 * Math.cos(angle);
-          const cy = 10 + 4.5 * Math.sin(angle);
-          return <circle key={i} cx={cx} cy={cy} r="0.8" />;
-        })}
-      </g>
-    </svg>
-  );
-}
+import { VenezuelaFlag } from "../components/VenezuelaFlag";
 
 export default function HomePage() {
   usePageTitle(null);
@@ -113,25 +31,25 @@ export default function HomePage() {
   return (
     <>
       {/* ── HERO ───────────────────────────────────────────────── */}
-      <section
-        className="relative bg-[#0d0d0d] text-white overflow-hidden min-h-[480px] flex items-center"
-        style={{
-          backgroundImage:
-            "radial-gradient(ellipse at 0% 100%, rgba(224,80,32,0.14) 0%, transparent 55%), radial-gradient(ellipse at 100% 0%, rgba(224,80,32,0.06) 0%, transparent 55%)",
-        }}
-      >
-        {/* Grid overlay */}
+      <section className="relative bg-[#0d0d0d] text-white overflow-hidden min-h-[480px] flex items-center">
+        {/* Shop photo */}
         <div
-          className="absolute inset-0 opacity-[0.025]"
+          className="absolute inset-0"
           style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)",
-            backgroundSize: "52px 52px",
+            backgroundImage: "url('/hero-shop.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center 40%",
           }}
         />
 
-        {/* Car silhouette */}
-        <CarSilhouette />
+        {/* Dark scrim so text stays readable over the photo */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(90deg, rgba(13,13,13,0.97) 0%, rgba(13,13,13,0.92) 38%, rgba(13,13,13,0.65) 68%, rgba(13,13,13,0.4) 100%), radial-gradient(ellipse at 0% 100%, rgba(224,80,32,0.16) 0%, transparent 55%)",
+          }}
+        />
 
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 py-20 md:py-28 w-full">
