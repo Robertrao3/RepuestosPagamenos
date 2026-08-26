@@ -6,9 +6,9 @@ import { supabase } from "./supabase";
 import { CartProvider, useCart } from "./context/CartContext";
 import { CartDrawer } from "./components/CartDrawer";
 import { VenezuelaFlag } from "./components/VenezuelaFlag";
+import { CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL, CONTACT_EMAIL, WHATSAPP_URL } from "./constants/contact";
 
 import HomePage from "./pages/HomePage";
-const ServicesPage = lazy(() => import("./pages/ServicesPage"));
 const InventoryPage = lazy(() => import("./pages/InventoryPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
@@ -20,7 +20,6 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const NAV_LINKS = [
   { to: "/", label: "Inicio" },
   { to: "/inventory", label: "Inventario" },
-  { to: "/services", label: "Servicios" },
   { to: "/about", label: "Nosotros" },
   { to: "/contact", label: "Contacto" },
   { to: "/request", label: "Solicitar repuesto" },
@@ -188,7 +187,6 @@ function AppShell() {
         <Suspense fallback={<div className="max-w-7xl mx-auto px-8 py-16 text-center text-gray-400">Cargando...</div>}>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/services" element={<ServicesPage />} />
             <Route path="/inventory" element={<InventoryPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
@@ -226,8 +224,9 @@ function AppShell() {
 
           <div>
             <p className="text-white/30 text-xs uppercase tracking-widest mb-3 font-semibold">Contacto</p>
-            <a href="tel:+584126261061" className="text-white/60 text-sm hover:text-[#E05020] transition-colors block">+58 412-6261061</a>
-            <a href="mailto:ventas@repuestospagamenos.com" className="text-white/60 text-sm hover:text-[#E05020] transition-colors block mt-0.5">ventas@repuestospagamenos.com</a>
+            <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="text-white/60 text-sm hover:text-[#25D366] transition-colors block font-medium">WhatsApp: {CONTACT_PHONE_DISPLAY}</a>
+            <a href={`tel:${CONTACT_PHONE_TEL}`} className="text-white/60 text-sm hover:text-[#E05020] transition-colors block mt-0.5">Llamar: {CONTACT_PHONE_DISPLAY}</a>
+            <a href={`mailto:${CONTACT_EMAIL}`} className="text-white/60 text-sm hover:text-[#E05020] transition-colors block mt-0.5">{CONTACT_EMAIL}</a>
             <p className="text-white/60 text-sm mt-2">Esq. Puente Soublette, Caracas</p>
           </div>
         </div>

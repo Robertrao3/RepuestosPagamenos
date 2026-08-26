@@ -1,4 +1,6 @@
+import { MessageCircle } from "lucide-react";
 import { usePageTitle } from "../hooks/usePageTitle";
+import { CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL, CONTACT_EMAIL, WHATSAPP_URL } from "../constants/contact";
 
 const HOURS = [
   { day: "Lunes – Viernes", hours: "8:00 AM – 5:00 PM" },
@@ -6,8 +8,20 @@ const HOURS = [
   { day: "Domingo", hours: "Cerrado" },
 ];
 
+// Keep in sync with the HOURS table above.
+function isOpenNow() {
+  const caracasNow = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Caracas" }));
+  const day = caracasNow.getDay();
+  const hour = caracasNow.getHours() + caracasNow.getMinutes() / 60;
+  if (day === 0) return false;
+  if (day === 6) return hour >= 8 && hour < 13.5;
+  return hour >= 8 && hour < 17;
+}
+
 export default function ContactPage() {
   usePageTitle("Contacto");
+  const open = isOpenNow();
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header banner */}
@@ -22,17 +36,29 @@ export default function ContactPage() {
       <div className="h-1 bg-[#E05020]" />
 
       <div className="max-w-5xl mx-auto px-4 md:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {/* WhatsApp CTA */}
+        <a
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center justify-center gap-3 w-full bg-[#25D366] hover:bg-[#1ebe5a] text-white font-bold text-lg py-5 rounded-2xl shadow-lg shadow-[#25D366]/20 transition-colors mb-3"
+        >
+          <MessageCircle className="w-6 h-6" />
+          Escríbenos por WhatsApp
+        </a>
+        <p className="text-center text-xs text-gray-400 mb-8">
+          {open
+            ? "🟢 Abierto ahora — respuesta rápida"
+            : "🔴 Fuera de horario — te responderemos apenas abramos"}
+        </p>
 
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {/* Phone */}
           <div className="border border-gray-200 rounded-xl p-6">
             <div className="text-2xl mb-3">📞</div>
             <h3 className="font-bold text-gray-900 text-sm uppercase tracking-wider mb-3">Teléfono</h3>
-            <a href="tel:+584126261061" className="text-[#E05020] font-semibold text-lg hover:underline block">
-              +58 412-6261061
-            </a>
-            <a href="https://wa.me/584126261061" target="_blank" rel="noreferrer" className="text-gray-400 text-xs mt-1 hover:text-green-600 transition-colors block">
-              WhatsApp disponible →
+            <a href={`tel:${CONTACT_PHONE_TEL}`} className="text-[#E05020] font-semibold text-lg hover:underline block">
+              {CONTACT_PHONE_DISPLAY}
             </a>
           </div>
 
@@ -40,11 +66,8 @@ export default function ContactPage() {
           <div className="border border-gray-200 rounded-xl p-6">
             <div className="text-2xl mb-3">✉️</div>
             <h3 className="font-bold text-gray-900 text-sm uppercase tracking-wider mb-3">Correo</h3>
-            <a href="mailto:info@repuestospagamenos.com" className="text-gray-700 text-sm hover:text-[#E05020] transition-colors block">
-              info@repuestospagamenos.com
-            </a>
-            <a href="mailto:ventas@repuestospagamenos.com" className="text-gray-700 text-sm hover:text-[#E05020] transition-colors block mt-1">
-              ventas@repuestospagamenos.com
+            <a href={`mailto:${CONTACT_EMAIL}`} className="text-gray-700 text-sm hover:text-[#E05020] transition-colors block break-all">
+              {CONTACT_EMAIL}
             </a>
           </div>
 
