@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabase";
 import { usePageTitle } from "../hooks/usePageTitle";
+import { notifyOwner } from "../lib/notifyOwner";
 
 function generateOrderNumber() {
   const d = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -45,6 +46,19 @@ export default function RequestPage() {
     if (err) {
       setError("Ocurrió un error al enviar tu solicitud. Intenta de nuevo.");
     } else {
+      notifyOwner({
+        subject: `Nueva solicitud de repuesto — ${order_number}`,
+        message: [
+          `Solicitud: ${order_number}`,
+          `Nombre: ${form.nombre}`,
+          `Teléfono: ${form.telefono}`,
+          form.email && `Email: ${form.email}`,
+          form.vehiculo && `Vehículo: ${form.vehiculo}`,
+          `Repuesto solicitado: ${form.repuesto}`,
+        ].filter(Boolean).join("\n"),
+        replyTo: form.email,
+        fromName: form.nombre,
+      });
       setOrderNumber(order_number);
       setForm({ nombre: "", telefono: "", email: "", vehiculo: "", repuesto: "" });
     }
@@ -102,6 +116,11 @@ export default function RequestPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="bg-[#E05020]/10 border border-[#E05020]/20 rounded-xl px-4 py-3 text-sm text-gray-700">
+                  Si no consigues tu repuesto en nuestro inventario, por favor solicítalo aquí y te
+                  daremos más información sobre si tenemos el producto disponible.
+                </div>
+
                 {error && (
                   <div className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">
                     {error}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { X, Minus, Plus, ShoppingCart } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { supabase } from "../supabase";
+import { notifyOwner } from "../lib/notifyOwner";
 
 function generateOrderNumber() {
   const d = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -51,6 +52,20 @@ export function CartDrawer({ open, onClose }) {
     if (err) {
       setError("Error al enviar el pedido. Intenta de nuevo.");
     } else {
+      notifyOwner({
+        subject: `Nuevo pedido — ${order_number}`,
+        message: [
+          `Pedido: ${order_number}`,
+          `Nombre: ${form.nombre}`,
+          `Teléfono: ${form.telefono}`,
+          form.email && `Email: ${form.email}`,
+          form.vehiculo && `Vehículo: ${form.vehiculo}`,
+          `Artículos:`,
+          ...items.map((i) => `- ${i.nombre} (${i.codigo || i.id}) ×${i.qty}`),
+        ].filter(Boolean).join("\n"),
+        replyTo: form.email,
+        fromName: form.nombre,
+      });
       setOrderNumber(order_number);
       clearCart();
     }
